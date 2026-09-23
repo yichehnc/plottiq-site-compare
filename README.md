@@ -1,0 +1,44 @@
+# Site Comparison + AI Pre-assessment (Plott iQ prototype)
+
+Zero-dependency practice build for the Cuboid Ventures 45-min test.
+
+## Run
+```bash
+node server.mjs                                   # seeded demo (no key) → http://localhost:3000
+ANTHROPIC_API_KEY=sk-... node server.mjs          # live AI
+# Windows PowerShell: $env:ANTHROPIC_API_KEY="sk-..."; node server.mjs
+# Optional: ANTHROPIC_MODEL=<model id>
+```
+Needs Node 20.11+ (uses `import.meta.dirname`).
+
+## Files
+| File | Role |
+|---|---|
+| `public/data.js` | Strategy + 3 mock sites (swap first) |
+| `public/logic.js` | Code-calculated yield, quick feaso, risk flags, score |
+| `public/app.js` | Render table + AI cards, call `/api/assess` |
+| `public/styles.css` | Plott iQ tokens (bg `#070806`, accent `#c9ef72`, card `#15161d`, radius 10/16) |
+| `server.mjs` | Static server + Anthropic call; seeded demo when no key or `DEMO=1` |
+| `seed.mjs` | Hand-written example assessment used in demo mode |
+
+## Principle (say this out loud)
+**Code calculates, AI interprets.** Rules are cheap, fast, explainable. AI only does what the table can't: connect constraints and find the deal-breaker. Every value is tagged Source / Calculated / AI — mirrors Plott iQ's data & methodology page.
+
+## 45-min run sheet
+- **0–5** Frame: user = developer with 3 sites; job = pick where to spend DD. Say what's cut.
+- **5–10** Data shape + mock data (`data.js`).
+- **10–25** Table + rule flags (`logic.js`, `renderTable`).
+- **25–35** AI endpoint + JSON contract + cards.
+- **35–40** Loading / error / mock fallback, provenance legend, disclaimer.
+- **40–45** Demo: problem → click → leader + deal-breaker → next steps.
+
+## If you have spare time
+- Editable strategy (inputs → recompute flags live)
+- "Progress to Qascade" button: POST site + assumptions as a new project
+- Paste an agent listing → AI extracts fields into a 4th site
+- Stream the AI response; cache per input hash
+
+## Talking points
+- Why not a chat box: their platform page says AI is embedded, not bolted on.
+- Guardrails: JSON contract, "never invent data → list as missing DD", preliminary disclaimer.
+- Eval idea: fixed site fixtures with a known deal-breaker; assert the AI names it.

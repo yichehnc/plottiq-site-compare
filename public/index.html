@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Site Comparison · Plott iQ prototype</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <div class="brand">Plott <span>iQ</span></div>
+      <span class="tag">Site Comparison · Beta</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Compare → Shortlist</p>
+        <h1>Which site deserves your next dollar of due diligence?</h1>
+        <p class="lede">Three candidates, one strategy. Code checks the rules; AI finds the constraint that ends the deal.</p>
+        <div class="strategy" id="strategy"></div>
+      </div>
+      <button class="btn btn-primary" id="assessBtn">Run AI pre-assessment</button>
+    </div>
+
+    <section>
+      <div class="legend muted" style="margin-bottom:10px">
+        <span><i class="prov source"></i>Source data</span>
+        <span><i class="prov calc"></i>Calculated</span>
+        <span><i class="prov ai"></i>AI-assisted</span>
+      </div>
+      <div class="card table-card"><table id="table"></table></div>
+    </section>
+
+    <section>
+      <p class="eyebrow" style="margin-bottom:10px">Preliminary assessment</p>
+      <div id="ai"><div class="empty">Run the pre-assessment to get a verdict, deal-breaker and next step for each site.</div></div>
+      <p class="disclaimer">Preliminary intelligence only. AI output can be wrong or incomplete. Confirm with planning, legal, survey and valuation professionals before relying on it.</p>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
