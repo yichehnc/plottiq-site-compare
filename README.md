@@ -42,3 +42,6 @@ Needs Node 20.11+ (uses `import.meta.dirname`).
 - Why not a chat box: their platform page says AI is embedded, not bolted on.
 - Guardrails: JSON contract, "never invent data → list as missing DD", preliminary disclaimer.
 - Eval idea: fixed site fixtures with a known deal-breaker; assert the AI names it.
+
+## Deploy (Vercel)
+Import the repo on vercel.com → Framework: Other → Deploy. `vercel.json` serves `public/`; `api/assess.mjs` is the function. Add `ANTHROPIC_API_KEY` env var for live AI; without it the seeded example is served.
