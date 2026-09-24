@@ -7,8 +7,7 @@ export function estYield(site) {
 }
 
 // Very rough feaso: GRV vs land + build (~$380k/townhouse) + costs (~10% of GRV)
-export function quickFeaso(site) {
-  const units = estYield(site);
+export function quickFeaso(site, units = estYield(site)) {
   const grv = units * site.medianTownhouse;
   const cost = site.price + units * 380_000 + grv * 0.10;
   const margin = grv ? (grv - cost) / cost : 0;

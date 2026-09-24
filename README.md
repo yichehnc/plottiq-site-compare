@@ -49,3 +49,9 @@ Import the repo on vercel.com → Framework: Other → Deploy. `vercel.json` ser
 ## AI contract (v2)
 Adds `sharedRisks[]`, `upset`, and per site `fixability` (Resolvable / Partly resolvable / Structural), `fixNote`, `distinguishing` — mirrors Plott iQ's planned Site Comparison ("which risks distinguish vs are shared", "a lower-ranked site's weaknesses are resolvable").
 Decisions (Promote / Monitor / Release) are saved with timestamp, AI verdict, rule score and reason to a decision record (browser localStorage); "overrode AI" is flagged.
+
+## Site plan test fit (the "wow" moment)
+`public/siteplan.js` draws a to-scale SVG test fit of the selected site (AI leader, or whichever you Promote): lot, setbacks, driveway, townhouse footprints, overlays (DDO band, heritage dwelling, flood extent, tree TPZ), north arrow, scale bar, title block.
+- **Drag the rear setback**: at 6.5 m on 12 Example St the third townhouse turns red ("doesn't fit"), yield drops 3 → 2 and margin 26% → 2%. The drawing *verifies the AI's deal-breaker with geometry*.
+- Rules are explicit (`RULES` in siteplan.js) and labelled "calculated, illustrative" — it tests yield, it is not a design.
+- Demo line: "The AI said the DDO could cost the third townhouse. Here's the fit — it holds to 6.4 m. That's the planner question to ask before the offer."

@@ -1,6 +1,7 @@
 import { strategy, sites } from "./data.js";
 import { estYield, quickFeaso, riskFlags, score } from "./logic.js";
 import { seedAssessment } from "./seed.js";
+import { computePlan, renderPlanSVG, RULES } from "./siteplan.js";
 
 // Preset by default (no API key). Add ?live to the URL to call /api/assess; falls back to preset on any error.
 const LIVE = new URLSearchParams(location.search).has("live");
@@ -134,6 +135,7 @@ $("#ai").addEventListener("click", (e) => {
     at: new Date().toISOString(),
   });
   save(); renderTable(); renderAI(); renderLog();
+  if (decision === "Promote") { planSite = id; renderPlan(true); $("#planSection").scrollIntoView({ behavior: "smooth", block: "start" }); }
 });
 
 $("#clearLog").addEventListener("click", () => { decisions = []; save(); renderTable(); renderAI(); renderLog(); });
@@ -149,7 +151,90 @@ $("#assessBtn").addEventListener("click", async () => {
     ai = await presetAssess();
   }
   renderTable(); renderAI();
+  planSite = decisions.find((d) => d.decision === "Promote")?.id || ai.leader;
+  renderPlan(true);
   btn.disabled = false; btn.textContent = "Re-run AI pre-assessment";
+});
+
+// ---------- Site plan test fit ----------
+let planSite = null;
+const rearBy = {}; // per-site rear setback chosen on the slider
+
+function renderPlan(animate = false, keepSlider = false) {
+  const sec = $("#planSection");
+  if (!planSite) { sec.hidden = true; return; }
+  sec.hidden = false;
+  const site = rows.find((r) => r.id === planSite);
+  const rear = rearBy[site.id] ?? site.plan?.rearSetback ?? 4;
+  const plan = computePlan(site, rear);
+  const a = ai?.sites.find((x) => x.id === site.id);
+  const d = latest(site.id);
+  const pct = (n) => `${Math.round(n * 100)}%`;
+  const target = strategy.targetMargin;
+
+  $("#planTitle").textContent = site.address.split(",")[0];
+  $("#planTabs").innerHTML = rows.map((r) => `<button role="tab" aria-selected="${r.id === site.id}" class="tab ${r.id === site.id ? "is-active" : ""}" data-plan="${r.id}">${r.address.split(" ").slice(0, 2).join(" ")}${r.id === ai?.leader ? '<i class="tab-dot"></i>' : ""}</button>`).join("");
+  $("#planSvg").innerHTML = renderPlanSVG(site, plan, { animate });
+  if (animate) setTimeout(() => $("#planSvg svg")?.classList.remove("is-animating"), 2600); // settle to static styles
+
+  const flags = [];
+  if (plan.lost) flags.push(["danger", `Rear setback costs ${plan.lost} dwelling${plan.lost > 1 ? "s" : ""}`]);
+  if (plan.narrow) flags.push(["warn", `Driveway leaves ${plan.unitW.toFixed(1)} m for dwellings (< ${RULES.minW} m)`]);
+  if (plan.tree && plan.treeLimit < plan.rearLine) flags.push(["warn", "Tree protection zone sets the rear limit"]);
+  if (plan.p.heritageDwelling) flags.push(["danger", "Retained heritage dwelling occupies the front"]);
+  if (plan.p.flood) flags.push(["warn", "Flood overlay: floor levels to confirm"]);
+  if (plan.garden < RULES.gardenMin) flags.push(["danger", `Garden area below ${pct(RULES.gardenMin)} minimum`]);
+
+  const sliderStyle = `--pct:${((rear - 2) / 10) * 100}%; --thr:${Math.min(100, Math.max(0, ((plan.rearMax - 2) / 10) * 100))}%`;
+  const th = (n) => `${n} townhouse${n === 1 ? "" : "s"}`;
+  const hint = !plan.potential ? "No townhouses fit this strategy"
+    : plan.rearMax > 12 ? `Setback isn't the constraint here: yield is capped at ${th(plan.potential)} by <b>${plan.capReason}</b>`
+    : `${th(plan.potential)} fit up to a <b>${plan.rearMax.toFixed(1)} m</b> rear setback`;
+  const statsHTML = `
+    <div class="yield">
+      <span class="yield__n" data-n="${plan.dwellings}">${plan.dwellings}</span>
+      <span class="yield__lbl">dwellings fit<br><span class="muted">${plan.n} new townhouse${plan.n === 1 ? "" : "s"}${plan.p.heritageDwelling ? " + 1 retained" : ""}</span></span>
+    </div>
+
+
+    <dl class="kv">
+      <div><dt>Garden area</dt><dd><span class="meter"><i style="width:${Math.min(100, plan.garden * 100)}%" class="${plan.garden < RULES.gardenMin ? "bad" : ""}"></i><b style="left:${RULES.gardenMin * 100}%"></b></span>${pct(plan.garden)} <span class="muted">min ${pct(RULES.gardenMin)}</span></dd></div>
+      <div><dt>Margin at this yield</dt><dd class="${plan.feaso.margin < target ? "neg" : "pos"}">${pct(plan.feaso.margin)} <span class="muted">target ${pct(target)}</span></dd></div>
+    </dl>
+
+    ${flags.length ? `<div class="flags">${flags.map(([l, t]) => `<span class="badge badge-${l}">${t}</span>`).join("")}</div>` : ""}
+
+    ${a ? `<blockquote class="ai-quote"><span class="eyebrow">Testing the AI's deal-breaker ${P("ai")}</span><p>${a.dealBreaker}</p></blockquote>` : ""}
+
+    <table class="titleblock">
+      <tr><th>Sheet</th><td>TF-01 · Test fit</td><th>Status</th><td>${d ? d.decision : a ? a.verdict : "—"}</td></tr>
+      <tr><th>Site</th><td colspan="3">${site.address} · ${site.zone} · ${site.area} m²</td></tr>
+      <tr><th>Basis</th><td colspan="3">${RULES.unitW}×${RULES.unitD} m townhouses · ${RULES.front} m front · ${RULES.side} m side · ${RULES.drive} m drive</td></tr>
+    </table>`;
+  if (keepSlider && $("#rearSlider")) {
+    $("#planStats").innerHTML = statsHTML;
+    $("#rearVal").textContent = `${rear.toFixed(1)} m`;
+    $("#rearHint").innerHTML = hint;
+    $("#rearSlider").style.cssText = sliderStyle;
+    return;
+  }
+  $("#planSide").innerHTML = `
+    <label class="slider">
+      <span class="slider__row"><span class="eyebrow">Rear setback · drag to test</span><strong id="rearVal">${rear.toFixed(1)} m</strong></span>
+      <input type="range" id="rearSlider" min="2" max="12" step="0.5" value="${rear}" style="${sliderStyle}" aria-label="Rear setback in metres" />
+      <span class="slider__hint" id="rearHint">${hint}</span>
+    </label>
+    <div id="planStats">${statsHTML}</div>`;
+}
+
+$("#planTabs").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-plan]"); if (!b) return;
+  planSite = b.dataset.plan; renderPlan(true);
+});
+$("#planSide").addEventListener("input", (e) => {
+  if (e.target.id !== "rearSlider") return;
+  rearBy[planSite] = +e.target.value;
+  renderPlan(false, true);
 });
 
 async function presetAssess() {

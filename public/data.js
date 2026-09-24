@@ -23,6 +23,7 @@ export const sites = [
     comparableSales: 12,
     medianTownhouse: 1_250_000,
     notes: "Gentle fall to street. Service pit near crossover.",
+    plan: { street: "Example St", rearSetback: 4, servicePit: true, ddoRear: true }, // illustrative plan hints
   },
   {
     id: "b",
@@ -36,6 +37,7 @@ export const sites = [
     comparableSales: 4,
     medianTownhouse: 980_000,
     notes: "Battle-axe driveway possible. Large canopy tree near rear boundary.",
+    plan: { street: "Sample Ave", rearSetback: 4, tree: { x: 4.5, fromRear: 12, canopy: 4, tpz: 7.5 } },
   },
   {
     id: "c",
@@ -49,5 +51,6 @@ export const sites = [
     comparableSales: 9,
     medianTownhouse: 1_200_000,
     notes: "Period dwelling on site. Laneway at rear.",
+    plan: { street: "Placeholder Ct", rearSetback: 4, heritageDwelling: true, flood: true, laneway: true },
   },
 ];
