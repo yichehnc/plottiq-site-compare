@@ -5,10 +5,20 @@ export const seedAssessment = {
   leader: "a",
   why:
     "12 Example St is the only site where zone, frontage and comparable evidence all support the 3-townhouse strategy, and its one overlay affects the rear setback rather than the yield itself. 48 Sample Ave is cheaper but its 12.8 m frontage and thin sales evidence make both the design and the end value uncertain; 7 Placeholder Ct fails on zoning before the overlays are even considered.",
+  sharedRisks: [
+    "None of the three has had a title or covenant search yet, so a restriction on multi-dwelling use could apply to any of them.",
+    "Planning data may lag recent scheme amendments. Controls need confirming with Council on every site.",
+    "All end values rest on recent townhouse sales. None has been tested with presales.",
+  ],
+  upset:
+    "48 Sample Ave's problems are mostly resolvable: if the arborist sets a small tree protection zone and the vendor drops about 10%, it becomes a cheaper route to 3 dwellings. 7 Placeholder Ct's zoning is structural, so it can't overtake either site.",
   sites: [
     {
       id: "a",
       verdict: "Shortlist",
+      fixability: "Resolvable",
+      fixNote: "A planner-led layout can likely fit 3 dwellings within the setback; worst case is a smaller third unit.",
+      distinguishing: "The only site whose main risk is design, not zoning, geometry or evidence.",
       dealBreaker:
         "The DDO rear-setback control could push the third townhouse forward into the garden-area requirement; if the setback exceeds ~6 m, yield likely drops to 2 and the 26% margin falls below target.",
       missingDD: [
@@ -23,6 +33,9 @@ export const seedAssessment = {
     {
       id: "b",
       verdict: "Monitor",
+      fixability: "Partly resolvable",
+      fixNote: "The tree and the price can move; the 12.8 m frontage cannot.",
+      distinguishing: "Cheapest entry, but the thinnest sales evidence and the narrowest frontage.",
       dealBreaker:
         "12.8 m frontage limits the layout to a battle-axe driveway, which together with the canopy tree near the rear boundary likely removes the third dwelling. At 2 dwellings the site doesn't stack up at the asking price.",
       missingDD: [
@@ -36,6 +49,9 @@ export const seedAssessment = {
     {
       id: "c",
       verdict: "Pass",
+      fixability: "Structural",
+      fixNote: "NRZ zoning and heritage protection can't be designed around for a 3-townhouse product.",
+      distinguishing: "The only site where zoning itself rules out the strategy.",
       dealBreaker:
         "NRZ zoning caps the site at 2 dwellings. With a Heritage Overlay likely protecting the period house, the realistic outcome is one new dwelling at the rear, and the flood overlay (SBO) adds floor-level constraints on top.",
       missingDD: [

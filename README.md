@@ -45,3 +45,7 @@ Needs Node 20.11+ (uses `import.meta.dirname`).
 
 ## Deploy (Vercel)
 Import the repo on vercel.com → Framework: Other → Deploy. `vercel.json` serves `public/`; `api/assess.mjs` is the function. Add `ANTHROPIC_API_KEY` env var for live AI; without it the seeded example is served.
+
+## AI contract (v2)
+Adds `sharedRisks[]`, `upset`, and per site `fixability` (Resolvable / Partly resolvable / Structural), `fixNote`, `distinguishing` — mirrors Plott iQ's planned Site Comparison ("which risks distinguish vs are shared", "a lower-ranked site's weaknesses are resolvable").
+Decisions (Promote / Monitor / Release) are saved with timestamp, AI verdict, rule score and reason to a decision record (browser localStorage); "overrode AI" is flagged.
