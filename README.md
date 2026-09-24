@@ -4,8 +4,8 @@ Zero-dependency practice build for the Cuboid Ventures 45-min test.
 
 ## Run
 ```bash
-node server.mjs                                   # seeded demo (no key) → http://localhost:3000
-ANTHROPIC_API_KEY=sk-... node server.mjs          # live AI
+node server.mjs                                   # → http://localhost:3000 (button returns preset assessment)
+ANTHROPIC_API_KEY=sk-... node server.mjs          # then open /?live for real AI (falls back to preset on error)
 # Windows PowerShell: $env:ANTHROPIC_API_KEY="sk-..."; node server.mjs
 # Optional: ANTHROPIC_MODEL=<model id>
 ```
@@ -18,8 +18,8 @@ Needs Node 20.11+ (uses `import.meta.dirname`).
 | `public/logic.js` | Code-calculated yield, quick feaso, risk flags, score |
 | `public/app.js` | Render table + AI cards, call `/api/assess` |
 | `public/styles.css` | Plott iQ tokens (bg `#070806`, accent `#c9ef72`, card `#15161d`, radius 10/16) |
-| `server.mjs` | Static server + Anthropic call; seeded demo when no key or `DEMO=1` |
-| `seed.mjs` | Hand-written example assessment used in demo mode |
+| `server.mjs` | Static server + `/api/assess` (live AI only with key) |
+| `public/seed.js` | Preset assessment returned on click — no key or server call needed |
 
 ## Principle (say this out loud)
 **Code calculates, AI interprets.** Rules are cheap, fast, explainable. AI only does what the table can't: connect constraints and find the deal-breaker. Every value is tagged Source / Calculated / AI — mirrors Plott iQ's data & methodology page.
@@ -44,7 +44,7 @@ Needs Node 20.11+ (uses `import.meta.dirname`).
 - Eval idea: fixed site fixtures with a known deal-breaker; assert the AI names it.
 
 ## Deploy (Vercel)
-Import the repo on vercel.com → Framework: Other → Deploy. `vercel.json` serves `public/`; `api/assess.mjs` is the function. Add `ANTHROPIC_API_KEY` env var for live AI; without it the seeded example is served.
+Import the repo on vercel.com → Framework: Other → Deploy. `vercel.json` serves `public/`; `api/assess.mjs` is the function. Add `ANTHROPIC_API_KEY` env var for live AI; the preset works without it (static hosting is enough); open `/?live` to use the function.
 
 ## AI contract (v2)
 Adds `sharedRisks[]`, `upset`, and per site `fixability` (Resolvable / Partly resolvable / Structural), `fixNote`, `distinguishing` — mirrors Plott iQ's planned Site Comparison ("which risks distinguish vs are shared", "a lower-ranked site's weaknesses are resolvable").

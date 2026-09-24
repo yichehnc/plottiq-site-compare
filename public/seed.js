@@ -1,4 +1,4 @@
-// Seeded pre-assessment for demo. Written to read like real model output:
+// Preset pre-assessment shown on click (no API key needed). Written to read like real model output:
 // it connects evidence across fields instead of restating the table.
 export const seedAssessment = {
   seeded: true,

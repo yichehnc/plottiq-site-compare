@@ -11,13 +11,13 @@ const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/cs
 
 createServer(async (req, res) => {
   try {
-    if (req.method === "POST" && req.url === "/api/assess") {
+    if (req.method === "POST" && req.url.split("?")[0] === "/api/assess") {
       let raw = ""; for await (const c of req) raw += c;
       const out = await assess(JSON.parse(raw));
       res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(out));
       return;
     }
-    const path = req.url === "/" ? "/index.html" : req.url.split("?")[0];
+    let path = req.url.split("?")[0]; if (path === "/") path = "/index.html";
     const file = await readFile(join(import.meta.dirname, "public", path.replace(/\.\./g, "")));
     res.writeHead(200, { "content-type": TYPES[extname(path)] || "text/plain" }).end(file);
   } catch (e) {

@@ -1,5 +1,9 @@
 import { strategy, sites } from "./data.js";
 import { estYield, quickFeaso, riskFlags, score } from "./logic.js";
+import { seedAssessment } from "./seed.js";
+
+// Preset by default (no API key). Add ?live to the URL to call /api/assess; falls back to preset on any error.
+const LIVE = new URLSearchParams(location.search).has("live");
 
 const $ = (s) => document.querySelector(s);
 const money = (n) => "$" + (n >= 1e6 ? (n / 1e6).toFixed(2) + "m" : Math.round(n / 1e3) + "k");
@@ -139,14 +143,26 @@ $("#assessBtn").addEventListener("click", async () => {
   btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> Assessing…`;
   renderAI("loading");
   try {
-    const payload = rows.map(({ id, address, price, area, frontage, orientation, zone, overlays, comparableSales, medianTownhouse, notes, yield: y, feaso, flags, score }) =>
-      ({ id, address, price, area, frontage, orientation, zone, overlays, comparableSales, medianTownhouse, notes, estYield: y, quickMargin: +feaso.margin.toFixed(3), ruleFlags: flags.map((f) => f.text), ruleScore: score }));
-    const res = await fetch("/api/assess", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ strategy, sites: payload }) });
-    if (!res.ok) throw new Error((await res.text()) || res.statusText);
-    ai = await res.json();
-    renderTable(); renderAI();
-  } catch (e) { renderAI(e); }
-  finally { btn.disabled = false; btn.textContent = "Re-run AI pre-assessment"; }
+    ai = LIVE ? await liveAssess() : await presetAssess();
+  } catch (e) {
+    console.warn("Live assessment failed, using preset:", e);
+    ai = await presetAssess();
+  }
+  renderTable(); renderAI();
+  btn.disabled = false; btn.textContent = "Re-run AI pre-assessment";
 });
+
+async function presetAssess() {
+  await new Promise((r) => setTimeout(r, 1200)); // feel like a real call
+  return structuredClone(seedAssessment);
+}
+
+async function liveAssess() {
+  const payload = rows.map(({ id, address, price, area, frontage, orientation, zone, overlays, comparableSales, medianTownhouse, notes, yield: y, feaso, flags, score }) =>
+    ({ id, address, price, area, frontage, orientation, zone, overlays, comparableSales, medianTownhouse, notes, estYield: y, quickMargin: +feaso.margin.toFixed(3), ruleFlags: flags.map((f) => f.text), ruleScore: score }));
+  const res = await fetch("/api/assess", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ strategy, sites: payload }) });
+  if (!res.ok) throw new Error((await res.text()) || res.statusText);
+  return res.json();
+}
 
 renderStrategy(); renderTable(); renderLog();
